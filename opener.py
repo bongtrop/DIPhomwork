@@ -1,5 +1,7 @@
 import numpy as np
 
+# PGM File to Matrix
+# Input pgm2mat(Filename)
 def pgm2mat(filename):
     f = open(filename, "rb")
 
@@ -28,8 +30,11 @@ def pgm2mat(filename):
             mat[i][j] = ord(byte)
             byte = f.read(1)
 
+    f.close()
     return mat
 
+# Matrix to PGM File
+# Input mat2pgm(Filename, Matrix)
 def mat2pgm(filename, mat, pgmtype="P5", level="255"):
     mat[mat>255] = 255
     mat[mat<0] = 0

@@ -1,27 +1,8 @@
 import numpy as np
 import math
 
-def GENP(A, b):
-    n =  len(A)
-    if b.size != n:
-        raise ValueError("Invalid argument: incompatible sizes between A & b.", b.size, n)
-    for pivot_row in xrange(n-1):
-        for row in xrange(pivot_row+1, n):
-            multiplier = A[row][pivot_row]/A[pivot_row][pivot_row]
-            A[row][pivot_row] = multiplier
-            for col in xrange(pivot_row + 1, n):
-                A[row][col] = A[row][col] - multiplier*A[pivot_row][col]
-            b[row] = b[row] - multiplier*b[pivot_row]
-    #print A
-    #print b
-    x = np.zeros(n)
-    k = n-1
-    x[k] = b[k]/A[k,k]
-    while k >= 0:
-        x[k] = (b[k] - np.dot(A[k,k+1:],x[k+1:]))/A[k,k]
-        k = k-1
-    return x
-
+# Gaussian Elimination Partial Pivoting
+# Input GEPP(Ax = b)
 def GEPP(A, b):
     n =  len(A)
     if b.size != n:
@@ -49,8 +30,10 @@ def GEPP(A, b):
         k = k-1
     return x
 
+# Bilinear Interpolate
+# Input bilinear(Matrix Image, Position y, Position x)
 def bilinear(mat, posy, posx):
-    if posx>255.0 or posy>255.0:
+    if posx>mat.shape[1]-1 or posy>mat.shape[0]-1:
         return mat[math.floor(posy)][math.floor(posx)]
 
     f00 = mat[math.floor(posy),math.floor(posx)]
