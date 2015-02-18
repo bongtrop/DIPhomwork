@@ -1,4 +1,5 @@
 import numpy as np
+import cal
 
 def mat2hist(im):
   hist = np.zeros(256, dtype=np.uint32)
@@ -6,6 +7,20 @@ def mat2hist(im):
       hist[i] = sum(sum(im==i))
 
   return hist
+
+def hist2im(hist):
+    hist[255] = 0
+    m = np.max(hist)
+    x = 255.0/m
+    hist = hist * x
+
+    im = np.zeros((256,512), dtype=np.uint8)
+    for i in range(0, 512, 2):
+      f = int(round(hist[i/2]))
+      for j in range(255, 255-f, -1):
+        im[j][i] = 255
+
+    return im
 
 def mat2bw(mat, V):
   bw = np.zeros(mat.shape, dtype=np.uint8)
@@ -15,6 +30,7 @@ def mat2bw(mat, V):
   return bw
 
 def moment(mat, p, q):
+  mat = mat.astype(np.float64)
   if (np.max(mat)>1):
     mat = mat/255
 
@@ -23,8 +39,12 @@ def moment(mat, p, q):
   return np.sum(np.array([[(x**p)*(y**q)*mat[y][x] for x in range(0, w)] for y in range(0,h)]))
 
 def central_moment(mat, p, q):
+  mat = mat.astype(np.float64)
   if (np.max(mat)>1):
     mat = mat/255
+
+  w = mat.shape[1]
+  h = mat.shape[0]
 
   M00 = moment(mat, 0, 0)
   M10 = moment(mat, 1, 0)
@@ -34,13 +54,14 @@ def central_moment(mat, p, q):
   return np.sum(np.array([[((x-xc)**p)*((y-yc)**q)*mat[y][x] for x in range(0, w)] for y in range(0,h)]))
 
 def norm_moment(mat, p, q):
+  mat = mat.astype(np.float64)
   if (np.max(mat)>1):
     mat = mat/255
 
   Cpq = central_moment(mat, p, q)
-  C01 = central_moment(mat, 0, 1)
+  C00 = central_moment(mat, 0, 0)
 
-  return Cpq/(C00**((p+q)*2)+1)
+  return Cpq/(C00**((p+q)/2+1))
 
 def hist2cdf(hist):
   area = np.sum(hist)
@@ -128,7 +149,6 @@ def otsu(mat, bias):
       maxx = between
 
   th = int((th1+th2)/2)+bias
-  print th
   bw = mat2bw(mat, range(th,256))
   return bw
 
@@ -144,3 +164,27 @@ def localotsu(mat, nh, nw):
       res[sh*i:sh*(i+1),sw*j:sw*(j+1)] = otsu(submat,104)
 
   return res
+
+def controlgrid(mat, grid, distgrid):
+    res = np.zeros(mat.shape, dtype=np.int32)
+    for i in range(0, 256):
+        A = [[grid[i]["x1"]*1.0, grid[i]["y1"]*1.0, grid[i]["x1"]*grid[i]["y1"]*1.0, 1.],
+             [grid[i]["x2"]*1.0, grid[i]["y2"]*1.0, grid[i]["x2"]*grid[i]["y2"]*1.0, 1.],
+             [grid[i]["x3"]*1.0, grid[i]["y3"]*1.0, grid[i]["x3"]*grid[i]["y3"]*1.0, 1.],
+             [grid[i]["x4"]*1.0, grid[i]["y4"]*1.0, grid[i]["x4"]*grid[i]["y4"]*1.0, 1.]]
+
+        B = [distgrid[i]["x1"], distgrid[i]["x2"], distgrid[i]["x3"], distgrid[i]["x4"]]
+        wx = cal.GEPP(np.array(A), np.array(B))
+
+        B = [distgrid[i]["y1"], distgrid[i]["y2"], distgrid[i]["y3"], distgrid[i]["y4"]]
+        wy = cal.GEPP(np.array(A), np.array(B))
+
+
+        for j in range((i/16)*16, ((i/16)+1)*16):
+            for k in range((i%16)*16, ((i%16)+1)*16):
+                posx = wx[0]*k + wx[1]*j + wx[2] * j * k + wx[3]
+                posy = wy[0]*k + wy[1]*j + wy[2] * j * k + wy[3]
+
+                res[j][k] = cal.bilinear(mat, posy, posx)
+
+    return res

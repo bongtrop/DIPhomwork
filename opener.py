@@ -31,7 +31,8 @@ def pgm2mat(filename):
     return mat
 
 def mat2pgm(filename, mat, pgmtype="P5", level="255"):
-    print mat.shape
+    mat[mat>255] = 255
+    mat[mat<0] = 0
     f = open(filename, "wb")
     w = mat.shape[1]
     h = mat.shape[0]
