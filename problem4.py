@@ -1,7 +1,6 @@
 import opener
-import cv2
 import dip
-import view
+# import view
 import numpy as np
 import json
 
@@ -27,7 +26,7 @@ for i in range(16,256,16):
 
 R[255,255] = 255
 
-view.mat(R, "Convolute Result")
+# view.mat(R, "Convolute Result")
 opener.mat2pgm('report/convolute_p4.pgm', R)
 
 grid_c = np.where(R==255)
@@ -57,11 +56,11 @@ json_data.close()
 
 p = opener.pgm2mat('dataset/distgrid.pgm')
 res = dip.controlgrid(p, grid, distgrid)
-view.mat(res, "Result from distgrid")
+# view.mat(res, "Result from distgrid")
 opener.mat2pgm('report/distgrid_fix_p4.pgm', res)
 
 p = opener.pgm2mat('dataset/distlenna.pgm')
 res = dip.controlgrid(p, grid, distgrid)
-view.mat(res, "Result from distlenna")
+# view.mat(res, "Result from distlenna")
 opener.mat2pgm('report/distlenna_fix_p4.pgm', res)
-view.show()
+# view.show()

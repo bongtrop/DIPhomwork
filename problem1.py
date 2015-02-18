@@ -1,12 +1,12 @@
 import dip
-import view
+# import view
 import cal
 import opener
 
 mat = opener.pgm2mat('dataset/scaled_shapes.pgm')
 hist = dip.mat2hist(mat)
 im = dip.hist2im(hist)
-view.mat(im, "histogram")
+#view.mat(im, "histogram")
 opener.mat2pgm('report/histogram_p1.pgm', mat)
 
 obj1 = dip.mat2bw(mat, [0])
@@ -20,13 +20,14 @@ opener.mat2pgm('report/obj1_p4.pgm', mat)
 obj5 = dip.mat2bw(mat, [200])
 opener.mat2pgm('report/obj1_p5.pgm', mat)
 
+'''
 view.mat(obj1, "OBJ 1")
 view.mat(obj2, "OBJ 2")
 view.mat(obj3, "OBJ 3")
 view.mat(obj4, "OBJ 4")
 view.mat(obj5, "OBJ 5")
 view.show()
-
+'''
 
 print "\nObject 1"
 M00 = dip.moment(obj1, 0, 0)

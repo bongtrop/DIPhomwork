@@ -1,5 +1,5 @@
 import dip
-import view
+# import view
 import cal
 import opener
 
@@ -12,11 +12,13 @@ excess_blue = 2*b - g - r
 redblue_diff = r - b
 gray = (r + g + b)/3
 
+'''
 view.mat(excess_green, " Excess Green")
 view.mat(redblue_diff, " Red-Blue Different")
 view.mat(gray, " Gray Scale")
 view.mat(excess_blue, "Excess Blue")
 view.show()
+'''
 
 opener.mat2pgm('report/excess_green_p3.pgm', excess_green)
 opener.mat2pgm('report/redblue_diff_p3.pgm', redblue_diff)
