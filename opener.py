@@ -19,7 +19,7 @@ def pgm2mat(filename):
     [w, h] = detail[1].split(' ')
     h = int(h)
     w = int(w)
-    mat = np.zeros((h,w), dtype=np.uint8)
+    mat = np.zeros((h,w), dtype=np.int32)
 
     byte = f.read(1)
 
