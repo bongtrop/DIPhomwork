@@ -94,16 +94,17 @@ def lpo(mat, m, c):
 
 def norm(mat):
   mat = mat.astype(np.float64)
-  mat = (mat/np.max(mat))*255
+  mat = ((mat-np.min(mat))/(np.max(mat)-np.min(mat)))*255
   return mat.astype(np.int32)
 
-def convolute(F, G, origin):
+def convolute(F, G, origin, fill=0):
   G = np.fliplr(G)
   G = np.flipud(G)
   origin[0] = G.shape[0] - origin[0]
   origin[1] = G.shape[1] - origin[1]
 
-  result = np.zeros(F.shape, dtype=np.int32)
+  result = np.ones(F.shape, dtype=np.int32)*fill
+
   for i in range(origin[0], F.shape[0]-origin[0]):
     for j in range(origin[1], F.shape[1]-origin[1]):
       try:
@@ -188,3 +189,28 @@ def controlgrid(mat, grid, distgrid):
                 res[j][k] = cal.bilinear(mat, posy, posx)
 
     return res
+
+def affine(mat, A, B, ori=[0,0], fill=0):
+    nmat = np.zeros(mat.shape, dtype=np.uint8)
+    for i in range(0, mat.shape[1]):
+        for j in range(0, mat.shape[0]):
+            pos = np.array([[i-ori[0]],[j-ori[1]]])
+            npos = np.dot(A, pos) + B
+            npos[0,0] = npos[0,0]+ori[0]
+            npos[1,0] = npos[1,0]+ori[1]
+
+
+            if npos[0,0]>=0 and npos[0,0]<mat.shape[0] and npos[1,0]>=0 and npos[1,0]<mat.shape[1]:
+                nmat[i, j] = mat[int(npos[0, 0]), int(npos[1,0])]
+            else:
+                nmat[i, j] = fill
+
+    return nmat
+
+def resize(mat, wr, hr):
+    nmat = np.zeros((mat.shape[1]*hr, mat.shape[0]*wr), dtype=np.uint8)
+    for i in range(0, nmat.shape[1]):
+        for j in range(0, nmat.shape[0]):
+            nmat[i, j] = mat[round(i/hr), round(j/wr)]
+
+    return nmat

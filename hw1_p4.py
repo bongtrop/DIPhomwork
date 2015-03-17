@@ -1,6 +1,5 @@
 import opener
 import dip
-# import view
 import numpy as np
 import json
 
@@ -26,7 +25,8 @@ for i in range(16,256,16):
 
 R[255,255] = 255
 
-# view.mat(R, "Convolute Result")
+view.mat(R, "Convolute Result")
+view.show()
 opener.mat2pgm('report/convolute_p4.pgm', R)
 
 grid_c = np.where(R==255)
