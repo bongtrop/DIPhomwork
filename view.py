@@ -1,3 +1,8 @@
+'''
+This module use opencv to show image
+Install opencv first
+'''
+
 import cv2
 import numpy as np
 

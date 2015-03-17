@@ -1,6 +1,8 @@
 import numpy as np
 import cal
 
+# Create Histogram From Image
+# Input mat2hist(Matrix Image)
 def mat2hist(im):
   hist = np.zeros(256, dtype=np.uint32)
   for i in range(0,256):
@@ -8,6 +10,8 @@ def mat2hist(im):
 
   return hist
 
+# Draw Histogram Image
+# Input mat2hist(Matrix Histogram)
 def hist2im(hist):
     hist[255] = 0
     m = np.max(hist)
@@ -22,6 +26,8 @@ def hist2im(hist):
 
     return im
 
+# Change Gray Matrix to Back-White Matrix
+# Input mat2bw(Matrix Image, Selection Gray Level)
 def mat2bw(mat, V):
   bw = np.zeros(mat.shape, dtype=np.uint8)
   for v in V:
@@ -29,6 +35,8 @@ def mat2bw(mat, V):
 
   return bw
 
+# Find Moment
+# Input moment(Matrix Image, p, q)
 def moment(mat, p, q):
   mat = mat.astype(np.float64)
   if (np.max(mat)>1):
@@ -38,6 +46,8 @@ def moment(mat, p, q):
   h = mat.shape[0]
   return np.sum(np.array([[(x**p)*(y**q)*mat[y][x] for x in range(0, w)] for y in range(0,h)]))
 
+# Find Central Moment
+# Input central_moment(Matrix Image, p, q)
 def central_moment(mat, p, q):
   mat = mat.astype(np.float64)
   if (np.max(mat)>1):
@@ -53,6 +63,8 @@ def central_moment(mat, p, q):
   yc = M01/M00
   return np.sum(np.array([[((x-xc)**p)*((y-yc)**q)*mat[y][x] for x in range(0, w)] for y in range(0,h)]))
 
+# Find Normalize Moment
+# Input norm_moment(Matrix Image, p, q)
 def norm_moment(mat, p, q):
   mat = mat.astype(np.float64)
   if (np.max(mat)>1):
@@ -63,6 +75,8 @@ def norm_moment(mat, p, q):
 
   return Cpq/(C00**((p+q)/2+1))
 
+# Find cdf from Histogram
+# Input hist2cdf(Histogram Matrix)
 def hist2cdf(hist):
   area = np.sum(hist)
   prop = 0
@@ -76,6 +90,8 @@ def hist2cdf(hist):
 
   return cdf
 
+# Histogram Equalizetion
+# Input histeq(Histogram Matrix)
 def histeq(mat):
   out = np.zeros(mat.shape, np.int32)
   hist = mat2hist(mat)
@@ -92,11 +108,16 @@ def lpo(mat, m, c):
 
   return mat
 
+# Normalization Matrix by maximum value
+# Input norm(Matrix)
 def norm(mat):
   mat = mat.astype(np.float64)
   mat = ((mat-np.min(mat))/(np.max(mat)-np.min(mat)))*255
   return mat.astype(np.int32)
 
+
+# Convolution Image
+# Input convolute(Matrix Image, Matrix Kernal, Origin)
 def convolute(F, G, origin, fill=0):
   G = np.fliplr(G)
   G = np.flipud(G)
@@ -114,7 +135,9 @@ def convolute(F, G, origin, fill=0):
 
   return result
 
-def otsu(mat, bias):
+# OTSU Threshold
+# Input convolute(Matrix Image)
+def otsu(mat, bias=0):
   hist = mat2hist(mat)
   total = np.sum(hist)
   summ = 0
@@ -153,22 +176,11 @@ def otsu(mat, bias):
   bw = mat2bw(mat, range(th,256))
   return bw
 
-
-def localotsu(mat, nh, nw):
-  res = np.zeros(mat.shape, np.int32)
-  sh = mat.shape[0]/nh
-  sw = mat.shape[1]/nw
-
-  for i in range(0,nh):
-    for j in range(0,sw):
-      submat = mat[sh*i:sh*(i+1),sw*j:sw*(j+1)]
-      res[sh*i:sh*(i+1),sw*j:sw*(j+1)] = otsu(submat,104)
-
-  return res
-
-def controlgrid(mat, grid, distgrid):
+# Backward Mapping Control Grid
+# Input controlgrid(Matrix Image, Grid, Distgrid)
+def controlgrid(mat, grid, distgrid, gridsize):
     res = np.zeros(mat.shape, dtype=np.int32)
-    for i in range(0, 256):
+    for i in range(0, len(grid)):
         A = [[grid[i]["x1"]*1.0, grid[i]["y1"]*1.0, grid[i]["x1"]*grid[i]["y1"]*1.0, 1.],
              [grid[i]["x2"]*1.0, grid[i]["y2"]*1.0, grid[i]["x2"]*grid[i]["y2"]*1.0, 1.],
              [grid[i]["x3"]*1.0, grid[i]["y3"]*1.0, grid[i]["x3"]*grid[i]["y3"]*1.0, 1.],
@@ -181,8 +193,8 @@ def controlgrid(mat, grid, distgrid):
         wy = cal.GEPP(np.array(A), np.array(B))
 
 
-        for j in range((i/16)*16, ((i/16)+1)*16):
-            for k in range((i%16)*16, ((i%16)+1)*16):
+        for j in range((i/gridsize)*gridsize, ((i/gridsize)+1)*gridsize):
+            for k in range((i%gridsize)*gridsize, ((i%gridsize)+1)*gridsize):
                 posx = wx[0]*k + wx[1]*j + wx[2] * j * k + wx[3]
                 posy = wy[0]*k + wy[1]*j + wy[2] * j * k + wy[3]
 
