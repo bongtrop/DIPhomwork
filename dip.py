@@ -1,5 +1,6 @@
 import numpy as np
 import cal
+import math
 
 # Create Histogram From Image
 # Input mat2hist(Matrix Image)
@@ -226,3 +227,50 @@ def resize(mat, wr, hr):
             nmat[i, j] = mat[round(i/hr), round(j/wr)]
 
     return nmat
+
+def filter(F,H):
+  return F*H
+
+def filterdesign(shape, mtype, parameter):
+    h = shape[0]
+    w = shape[1]
+    mat = np.zeros((h,w), dtype=np.float32)
+    for i in range(-h/2, h/2):
+        for j in range(-w/2, w/2):
+            if mtype=='ideal':
+                r = parameter[0]
+                if r*r>i*i+j*j:
+                    mat[i,j] = 1.0
+                else:
+                    mat[i,j] = 0.0
+
+            elif mtype=='gaussian':
+                s = parameter[0]
+                mat[i,j] = (1.0/(2*math.pi*s*s))*math.exp(-(i*i+j*j)/(2.0*s*s))
+
+            elif mtype=='butterworth':
+                n = parameter[0]
+                rc = parameter[1]
+                r = math.sqrt(i*i+j*j)
+                mat[i,j] = 1.0/math.sqrt(1+(r/rc)**(2*n))
+
+    return mat
+
+def medianfilter(mat, mh, mw):
+  nmat = np.copy(mat)
+  h = mat.shape[0]
+  w = mat.shape[1]
+  for i in range(0, h):
+    for j in range(0, w):
+      try:
+        window = []
+        for y in range(-mh/2,mh/2):
+          for x in range(-mw/2,mw/2):
+            window.append(mat[i+y,j+x])
+
+        window.sort();
+        nmat[i,j] = window[len(window)/2]
+      except:
+        pass
+
+  return nmat

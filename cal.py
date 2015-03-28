@@ -50,3 +50,14 @@ def bilinear(mat, posy, posx):
     posy = posy-math.floor(posy)
 
     return a*posx + b*posy + c*posx*posy + d
+
+def rms(F, G):
+    h = F.shape[0]
+    w = F.shape[1]
+    s = 0.0
+    for i in range(0,h):
+        for j in range(0,w):
+            s +=(F[i,j]-G[i,j])**2
+
+
+    return math.sqrt(s/(h*w))

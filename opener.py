@@ -52,5 +52,4 @@ def mat2pgm(filename, mat, pgmtype="P5", level="255"):
         for j in range(0,w):
             f.write(chr(mat[i][j]))
 
-
     f.close()
